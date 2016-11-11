@@ -17,6 +17,7 @@ package es.voghdev.pdfviewpager.library.adapter;
 
 import android.graphics.Bitmap;
 
+
 public class PdfRendererParams {
     private static final Bitmap.Config DEFAULT_CONFIG = Bitmap.Config.ARGB_8888;
 
@@ -64,5 +65,21 @@ public class PdfRendererParams {
 
     public void setConfig(Bitmap.Config config) {
         this.config = config;
+    }
+
+    public void setDimensions(int width, int height, float renderQuality) {
+        // @ToDo: re-examine the validity of these assumptions; determine REAL max bitmap size, consider orientation of tablet different from book
+        this.renderQuality = 1;
+
+        if (height > width) {
+            double aspectRatio = (double)width / (double)height;
+            this.height = 2048;
+            this.width = (int)(width * aspectRatio);
+        }
+        else {
+            double aspectRatio = (double)height / (double)width;
+            this.width = 2048;
+            this.height = (int)(height * aspectRatio);
+        }
     }
 }

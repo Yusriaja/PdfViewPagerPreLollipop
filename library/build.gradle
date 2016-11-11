@@ -63,6 +63,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.2.2'
     compile 'com.commit451:PhotoView:1.2.4'
+    compile 'com.github.barteksc:pdfium-android:1.4.0'
 }
 
 // Bintray installing and uploading scripts

@@ -18,7 +18,7 @@ package es.voghdev.pdfviewpager.library.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
-import android.graphics.pdf.PdfRenderer;
+//import android.graphics.pdf.PdfRenderer;
 import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 import android.view.View;
@@ -51,15 +51,20 @@ public class PDFPagerAdapter extends BasePDFPagerAdapter
         View v = inflater.inflate(R.layout.view_pdf_page, container, false);
         ImageView iv = (ImageView) v.findViewById(R.id.imageView);
 
-        if (renderer == null || getCount() < position) {
+ //       if (renderer == null || getCount() < position) {
+        if (pdfDocument == null || getCount() < position) {
             return v;
         }
 
-        PdfRenderer.Page page = getPDFPage(renderer, position);
+
+//        PdfRenderer.Page page = getPDFPage(renderer, position);
 
         Bitmap bitmap = bitmapContainer.get(position);
-        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-        page.close();
+//        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+//        page.close();
+        pdfiumCore.openPage(pdfDocument, position);
+
+        pdfiumCore.renderPageBitmap(pdfDocument, bitmap, position, 0, 0, params.getWidth(), params.getHeight());
 
         PhotoViewAttacher attacher = new PhotoViewAttacher(iv);
         attacher.setScale(scale.getScale(), scale.getCenterX(), scale.getCenterY(), true);

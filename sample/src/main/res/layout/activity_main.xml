@@ -1,4 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
+                a:layout_width="match_parent"
+                a:layout_height="match_parent"
+                a:orientation="vertical">
+    <es.voghdev.pdfviewpager.library.PDFViewPager
+        a:id="@+id/pdfViewPager"
+        a:layout_width="match_parent"
+        a:layout_height="match_parent"
+        a:layout_weight="1"/>
+    <LinearLayout   a:layout_width="match_parent"
+                    a:layout_height="50dp"
+                    a:orientation="horizontal">
+        <TextView
+            a:id="@+id/textView1"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:text="@string/txt1"/>
+
+
+        <TextView
+            a:id="@+id/txtFlatIcon"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:text="@string/flaticon_attr"
+            a:autoLink="web"
+            a:layout_above="@id/textView1"/>
+
+    </LinearLayout>
+</LinearLayout>
+<!--
 <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -24,6 +54,6 @@
         <es.voghdev.pdfviewpager.library.PDFViewPager
             android:id="@+id/pdfViewPager"
             android:layout_width="match_parent"
-            android:layout_height="480dp"/>
+            android:layout_height="1000px"/>
     </LinearLayout>
-</ScrollView>
+</ScrollView>-->

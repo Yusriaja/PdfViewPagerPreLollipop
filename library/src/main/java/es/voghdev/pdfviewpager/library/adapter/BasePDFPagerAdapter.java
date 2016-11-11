@@ -18,7 +18,6 @@ package es.voghdev.pdfviewpager.library.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.view.PagerAdapter;
@@ -27,6 +26,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import com.shockwave.pdfium.PdfDocument;
+import com.shockwave.pdfium.PdfiumCore;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +43,12 @@ public class BasePDFPagerAdapter extends PagerAdapter {
 
     String pdfPath;
     Context context;
-    PdfRenderer renderer;
+
+//21    PdfRenderer renderer;
+    PdfiumCore pdfiumCore;
+    PdfDocument pdfDocument;
+    PdfRendererParams params;
+
     BitmapContainer bitmapContainer;
     LayoutInflater inflater;
 
@@ -71,10 +78,12 @@ public class BasePDFPagerAdapter extends PagerAdapter {
 
     @SuppressWarnings("NewApi")
     protected void init() {
+        this.pdfiumCore = new PdfiumCore(context);
         try {
-            renderer = new PdfRenderer(getSeekableFileDescriptor(pdfPath));
+            this.pdfDocument = pdfiumCore.newDocument(getSeekableFileDescriptor(pdfPath));
+//            renderer = new PdfRenderer(getSeekableFileDescriptor(pdfPath));
             inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-            PdfRendererParams params = extractPdfParamsFromFirstPage(renderer, renderQuality);
+            PdfRendererParams params = extractPdfParamsFromFirstPage(pdfDocument, renderQuality);
             bitmapContainer = new SimpleBitmapPool(params);
         } catch (IOException e) {
             e.printStackTrace();
@@ -82,16 +91,24 @@ public class BasePDFPagerAdapter extends PagerAdapter {
     }
 
     @SuppressWarnings("NewApi")
-    private PdfRendererParams extractPdfParamsFromFirstPage(PdfRenderer renderer, float renderQuality) {
-        PdfRenderer.Page samplePage = getPDFPage(renderer, FIRST_PAGE);
-        PdfRendererParams params = new PdfRendererParams();
+//    private PdfRendererParams extractPdfParamsFromFirstPage(PdfRenderer renderer, float renderQuality) {
+      private PdfRendererParams extractPdfParamsFromFirstPage(PdfDocument pdfDocument, float renderQuality) {
+        pdfiumCore.openPage(pdfDocument, FIRST_PAGE);
+
+//      PdfRenderer.Page samplePage = getPDFPage(renderer, FIRST_PAGE);
+        params = new PdfRendererParams();
 
         params.setRenderQuality(renderQuality);
         params.setOffScreenSize(offScreenSize);
-        params.setWidth((int) (samplePage.getWidth() * renderQuality));
-        params.setHeight((int) (samplePage.getHeight() * renderQuality));
 
-        samplePage.close();
+        int width = pdfiumCore.getPageWidth(pdfDocument, FIRST_PAGE);
+//      params.setWidth((int) (samplePage.getWidth() * renderQuality));
+        int height = pdfiumCore.getPageHeight(pdfDocument, FIRST_PAGE);
+//      params.setHeight((int) (samplePage.getHeight() * renderQuality));
+
+        params.setDimensions(width, height, renderQuality);
+
+//      samplePage.close();
 
         return params;
     }
@@ -127,15 +144,18 @@ public class BasePDFPagerAdapter extends PagerAdapter {
         View v = inflater.inflate(R.layout.view_pdf_page, container, false);
         ImageView iv = (ImageView) v.findViewById(R.id.imageView);
 
-        if (renderer == null || getCount() < position) {
+//        if (renderer == null || getCount() < position) {
+        if (pdfiumCore == null || pdfDocument == null | pdfiumCore.getPageCount(pdfDocument) < position) {
             return v;
         }
 
-        PdfRenderer.Page page = getPDFPage(renderer, position);
+        pdfiumCore.openPage(pdfDocument, position);
+//      PdfRenderer.Page page = getPDFPage(renderer, position);
 
         Bitmap bitmap = bitmapContainer.get(position);
-        page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-        page.close();
+//      page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+//      page.close();
+        pdfiumCore.renderPageBitmap(pdfDocument, bitmap, position, 0, 0, params.getWidth(), params.getHeight() );
 
         iv.setImageBitmap(bitmap);
         ((ViewPager) container).addView(v, 0);
@@ -143,10 +163,10 @@ public class BasePDFPagerAdapter extends PagerAdapter {
         return v;
     }
 
-    @SuppressWarnings("NewApi")
-    protected PdfRenderer.Page getPDFPage(PdfRenderer renderer, int position) {
-        return renderer.openPage(position);
-    }
+//    @SuppressWarnings("NewApi")
+//    protected PdfRenderer.Page getPDFPage(PdfRenderer renderer, int position) {
+//        return renderer.openPage(position);
+//    }
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
@@ -157,9 +177,13 @@ public class BasePDFPagerAdapter extends PagerAdapter {
     @SuppressWarnings("NewApi")
     public void close() {
         releaseAllBitmaps();
-        if (renderer != null) {
-            renderer.close();
+//        if (renderer != null) {
+//            renderer.close();
+        if (pdfDocument != null) {
+            pdfiumCore.closeDocument(pdfDocument);
+            pdfDocument = null;
         }
+        pdfiumCore = null;
     }
 
     protected void releaseAllBitmaps() {
@@ -171,7 +195,8 @@ public class BasePDFPagerAdapter extends PagerAdapter {
     @Override
     @SuppressWarnings("NewApi")
     public int getCount() {
-        return renderer != null ? renderer.getPageCount() : 0;
+//        return renderer != null ? renderer.getPageCount() : 0;
+        return pdfDocument != null ? pdfiumCore.getPageCount(pdfDocument) : 0;
     }
 
     @Override
