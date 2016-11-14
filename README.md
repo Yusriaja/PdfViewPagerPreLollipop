@@ -1,4 +1,5 @@
-# PdfViewPager (forked to use PdfiumAndroid instead of API 21's PDFRenderer)
+PdfViewPager (forked to use PdfiumAndroid instead of API 21's PDFRenderer)
+--------------------------------------------------------------------------
 
 This project forks and makes a few small changes to Voghdev's PDFViewPager that allow it to use PdfiumAndroid
 as its rendering engine instead of API 21's new (and non-backported) android.graphics.pdf.* API.
@@ -8,7 +9,7 @@ I tried to keep the changes at a minimum to make future merges with the parent p
 I originally planned to make it renderer-agnostic and capable of using API21 on newer devices, 
 falling back to PdfiumAndroid on older (pre-5.0) devices, but decided against it for now. Why? 
 PdfiumAndroid is **huge** due to its use of native code for rendering (every supported CPU architecture needs 
-its own binary, and they're ALL bundled into the final .apk file).
+its own binary, and they're ALL bundled into the final .apk file). If the device is running 5.0 or newer, it's all pure bloat.
 
 I'm sure there's some way to use build flavors to allow building a huge monolithic .apk that works on older devices, 
 and a slimmed-down .apk without PdfiumAndroid for API21+ devices only... unfortunately, I don't know how to do it.
@@ -35,16 +36,17 @@ probably want to use library-debug.aar.
 
 
     compile project(':library-debug')
-
+    
     
     Add the following three lines immediately after it:
    
-    
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.2.2'
+    
     compile 'com.commit451:PhotoView:1.2.4'
+    
     compile 'com.github.barteksc:pdfium-android:1.4.0'
     
-Note that pdfium-android is absolutely required, but the other two lines were just blindly copied by me from PdfiumAndroid's build.gradle file
+Note that pdfium-android is absolutely required, but the other two lines were just blindly copied by me from the original project's build.gradle file
 without fully understanding what they do or whether they're actually used.
 
 Known issues:
