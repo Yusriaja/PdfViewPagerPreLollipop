@@ -1,20 +1,20 @@
-# PdfViewPager (revised to use PdfiumAndroid)
+# PdfViewPager (forked to use PdfiumAndroid instead of API 21's PDFRenderer)
 
-This project makes a few small changes to Voghdev's PDFViewPager that allow it to use PdfiumAndroid
-as its rendering engine instead of API21's new (and non-backported) android.graphics.pdf.* API.
+This project forks and makes a few small changes to Voghdev's PDFViewPager that allow it to use PdfiumAndroid
+as its rendering engine instead of API 21's new (and non-backported) android.graphics.pdf.* API.
 
 I tried to keep the changes at a minimum to make future merges with the parent project as easy as possible.
 
-I originally planned to make PDFViewPager renderer-agnostic and capable of using API21 on newer devices, 
-and PdfiumAndroid on older (pre-5.0) devices, but decided against it for now. Why? 
+I originally planned to make it renderer-agnostic and capable of using API21 on newer devices, 
+falling back to PdfiumAndroid on older (pre-5.0) devices, but decided against it for now. Why? 
 PdfiumAndroid is **huge** due to its use of native code for rendering (every supported CPU architecture needs 
 its own binary, and they're ALL bundled into the final .apk file).
 
 I'm sure there's some way to use build flavors to allow building a huge monolithic .apk that works on older devices, 
 and a slimmed-down .apk without PdfiumAndroid for API21+ devices only... unfortunately, I don't know how to do it.
 
-How to use this MODIFIED version in YOUR code:
-----------------------------------------------
+How to use this FORKED version with YOUR project:
+-------------------------------------------------
 
 1. Create a new Android Studio project to check out MY version from Github. ( File->New->Project from Version Control->GitHub )
 
@@ -46,6 +46,15 @@ probably want to use library-debug.aar.
     
 Note that pdfium-android is absolutely required, but the other two lines were just blindly copied by me from PdfiumAndroid's build.gradle file
 without fully understanding what they do or whether they're actually used.
+
+Known issues:
+-------------
+
+* The maximum resolution to which it will render a bitmap from a PDF page (regardless of what you specify for Quality) is 2048x2048.
+This limit exists because PDFViewPager (or one of its dependencies) uses the GPU for scaling,
+and older devices (like the Motorola Xoom) are limited to Bitmaps 2048x2048 or smaller. You COULD query OpenGL to determine the actual limit at runtime,
+but IMHO it's probably not worth the trouble... any device with a higher limit is likely to be running Android 5.0 or newer anyway & can
+use Voghdev's original version.
 
 **(the remainder of this README.md file is included verbatim from the project I forked, and has NOT been reviewed or edited
 to bring it into consistency with the changes I made to the library. Don't assume anything below this line accurately describes the way the FORKED library works.)**
