@@ -1,4 +1,55 @@
-# PdfViewPager
+# PdfViewPager (revised to use PdfiumAndroid)
+
+This project makes a few small changes to Voghdev's PDFViewPager that allow it to use PdfiumAndroid
+as its rendering engine instead of API21's new (and non-backported) android.graphics.pdf.* API.
+
+I tried to keep the changes at a minimum to make future merges with the parent project as easy as possible.
+
+I originally planned to make PDFViewPager renderer-agnostic and capable of using API21 on newer devices, 
+and PdfiumAndroid on older (pre-5.0) devices, but decided against it for now. Why? 
+PdfiumAndroid is **huge** due to its use of native code for rendering (every supported CPU architecture needs 
+its own binary, and they're ALL bundled into the final .apk file).
+
+I'm sure there's some way to use build flavors to allow building a huge monolithic .apk that works on older devices, 
+and a slimmed-down .apk without PdfiumAndroid for API21+ devices only... unfortunately, I don't know how to do it.
+
+How to use this MODIFIED version in YOUR code:
+----------------------------------------------
+
+1. Create a new Android Studio project to check out MY version from Github. ( File->New->Project from Version Control->GitHub )
+
+2. If Android Studio wants to update Gradle, decline for now unless you know how to troubleshoot Gradle errors. Recent versions
+in particular seem to be REALLY BAD at dealing with projects that haven't been actively maintained and upgraded in a while.
+
+3. Confirm that my project can successfully Gradle-sync, build, and run on your test device.
+
+4. Now, create or open your own project in Android Studio.
+
+5. File -> New -> New Module, then "Import jar/.aar package"
+ 
+6. The .aar file you want is located in {PdfViewPager-project-directory}/library/build/outputs/aar.
+There should be two files in that directory: library-debug.aar, and library-release.aar. For now, you'll 
+probably want to use library-debug.aar.
+
+7. Once you've completed step 6, your app's build.gradle should have added something like the following to the dependencies{} block:
+
+
+    compile project(':library-debug')
+
+    
+    Add the following three lines immediately after it:
+   
+    
+    compile 'it.sephiroth.android.library.imagezoom:imagezoom:2.2.2'
+    compile 'com.commit451:PhotoView:1.2.4'
+    compile 'com.github.barteksc:pdfium-android:1.4.0'
+    
+Note that pdfium-android is absolutely required, but the other two lines were just blindly copied by me from PdfiumAndroid's build.gradle file
+without fully understanding what they do or whether they're actually used.
+
+**(the remainder of this README.md file is included verbatim from the project I forked, and has NOT been reviewed or edited
+to bring it into consistency with the changes I made to the library. Don't assume anything below this line accurately describes the way the FORKED library works.)**
+
 
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-PdfViewPager-green.svg?style=true)](https://android-arsenal.com/details/1/3155)
 [![Build Status](https://travis-ci.org/voghDev/PdfViewPager.svg?branch=master)](https://travis-ci.org/voghDev/PdfViewPager)
